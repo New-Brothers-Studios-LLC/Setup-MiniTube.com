@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="es" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>miniTube | Premium Access</title>
+    <title>miniTube | Premium</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -17,16 +16,6 @@
                             surface: '#0f0f13',
                             accent: '#8b5cf6',
                             pink: '#ec4899'
-                        }
-                    },
-                    animation: {
-                        'slow-spin': 'spin 10s linear infinite',
-                        'float': 'float 5s ease-in-out infinite',
-                    },
-                    keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-15px)' },
                         }
                     }
                 }
@@ -43,244 +32,255 @@
             overflow-x: hidden;
         }
 
-        .bg-noise {
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
-            pointer-events: none;
-            opacity: 0.04;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-        }
-
         .glass {
-            background: rgba(20, 20, 25, 0.7);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(15, 15, 20, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .video-card {
-            transition: all 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .video-card:hover {
-            transform: scale(1.03) translateY(-8px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 20px rgba(139, 92, 246, 0.2);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.15);
         }
-
-        input::placeholder { color: rgba(255,255,255,0.3); }
 
         .hide-app { display: none !important; }
-        
-        .glow-text {
-            text-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
-        }
+        canvas { display: none; }
 
-        .no-scrollbar::-webkit-scrollbar { display: none; }
+        /* Estilo para el modal de bienvenida */
+        .premium-modal-bg {
+            background: radial-gradient(circle at center, rgba(139, 92, 246, 0.15) 0%, rgba(5, 5, 7, 1) 100%);
+        }
     </style>
 </head>
 <body>
-    <div class="bg-noise"></div>
+    <canvas id="thumb-generator"></canvas>
 
     <!-- PANTALLA DE LOGIN -->
     <div id="login-screen" class="fixed inset-0 z-[1000] flex items-center justify-center p-6 bg-tube-base">
-        <!-- Decoración de fondo -->
-        <div class="absolute w-[500px] h-[500px] bg-purple-600/10 blur-[120px] rounded-full animate-slow-spin"></div>
-        
-        <div class="glass w-full max-w-md p-10 rounded-[2.5rem] shadow-2xl relative z-10 text-center animate-float">
-            <div class="w-16 h-16 bg-gradient-to-tr from-purple-600 to-pink-500 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-lg shadow-purple-600/30">
-                <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <div class="glass w-full max-w-md p-10 rounded-[2.5rem] shadow-2xl text-center">
+            <div class="w-20 h-20 bg-gradient-to-tr from-purple-600 to-pink-500 rounded-3xl mx-auto mb-8 flex items-center justify-center shadow-2xl shadow-purple-600/40">
+                <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
             </div>
             <h1 class="text-4xl font-extrabold mb-2 tracking-tighter">mini<span class="text-purple-500">Tube</span></h1>
-            <p class="text-gray-400 text-sm mb-8">Acceso exclusivo para miembros premium</p>
+            <p class="text-gray-400 text-sm mb-10 tracking-widest font-light uppercase">Acceso Privado</p>
             
             <div class="space-y-4">
-                <div class="relative">
-                    <input type="text" id="username" placeholder="Usuario" class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-purple-500 transition-all text-white">
-                </div>
-                <div class="relative">
-                    <input type="password" id="password" placeholder="Contraseña" class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-purple-500 transition-all text-white">
-                </div>
-                <button onclick="handleLogin()" class="w-full bg-white text-black font-extrabold py-4 rounded-2xl hover:bg-purple-500 hover:text-white transition-all duration-300 transform active:scale-95 shadow-xl">
-                    ENTRAR AHORA
+                <input type="text" id="username" placeholder="Usuario" class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-purple-500 transition-all text-white">
+                <input type="password" id="password" placeholder="Contraseña" class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-purple-500 transition-all text-white">
+                <button onclick="handleLogin()" class="w-full bg-white text-black font-extrabold py-5 rounded-2xl hover:bg-purple-600 hover:text-white transition-all duration-500 transform active:scale-95 shadow-xl text-sm tracking-widest">
+                    ENTRAR
                 </button>
             </div>
-            <p id="error-msg" class="text-pink-500 text-xs mt-4 opacity-0 transition-opacity">Credenciales incorrectas. Intenta de nuevo.</p>
+            <p id="error-msg" class="text-pink-500 text-xs mt-6 opacity-0 transition-opacity">Credenciales incorrectas.</p>
         </div>
     </div>
 
-    <!-- APP PRINCIPAL (OCULTA POR DEFECTO) -->
-    <div id="main-app" class="hide-app">
-        <!-- Navbar -->
-        <nav class="fixed top-0 w-full z-50 p-4 md:p-6">
-            <div class="max-w-[1600px] mx-auto glass rounded-[2rem] p-4 px-8 flex items-center justify-between shadow-2xl">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
-                         <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    </div>
-                    <span class="text-2xl font-black tracking-tighter glow-text">mini<span class="text-purple-500">Tube</span></span>
-                </div>
-                
-                <div class="hidden md:flex gap-6 text-sm font-semibold text-gray-400">
-                    <a href="#" class="text-white">Inicio</a>
-                    <a href="#" class="hover:text-white">Tendencias</a>
-                    <a href="#" class="hover:text-white">Favoritos</a>
-                </div>
+    <!-- MODAL DE SUSCRIPCIÓN PREMIUM (POST-LOGIN) -->
+    <div id="premium-ad-modal" class="fixed inset-0 z-[2000] hidden items-center justify-center p-6 premium-modal-bg backdrop-blur-md">
+        <div class="glass w-full max-w-lg p-8 md:p-12 rounded-[3rem] shadow-2xl relative border-t border-purple-500/30 text-center">
+            <div class="text-6xl mb-6">🌟</div>
+            <h2 class="text-3xl font-black mb-2 tracking-tighter">Suscripción <span class="text-purple-500">PREMIUM</span></h2>
+            <p class="text-gray-400 mb-8 font-medium">Eleva tu experiencia al siguiente nivel</p>
+            
+            <ul class="text-left space-y-4 mb-10 inline-block">
+                <li class="flex items-center gap-3 text-sm">
+                    <span class="text-purple-500 font-bold">✓</span> Acceso a directos exclusivos
+                </li>
+                <li class="flex items-center gap-3 text-sm">
+                    <span class="text-purple-500 font-bold">✓</span> Acceso a calidad Full HD (1080p)
+                </li>
+                <li class="flex items-center gap-3 text-sm">
+                    <span class="text-purple-500 font-bold">✓</span> Acceso a Descargas por APK
+                </li>
+                <li class="flex items-center gap-3 text-sm">
+                    <span class="text-purple-500 font-bold">✓</span> Acceso a comentar en los videos
+                </li>
+                <li class="flex items-center gap-3 text-sm text-purple-400 font-bold italic">
+                    ¡Y muchas cosas más!
+                </li>
+            </ul>
 
+            <div class="space-y-4">
+                <a href="https://wa.me/50373826693?text=Hola,%20Quiero%20el%20premium%20By%20MiniTube" target="_blank" class="block w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white font-black py-5 rounded-2xl hover:brightness-110 transition-all shadow-lg shadow-purple-600/30 tracking-widest">
+                    COMPRAR $7.99/MES
+                </a>
+                <button onclick="closePremiumAd()" class="text-gray-500 text-xs hover:text-white transition-colors underline">Continuar a la versión gratuita</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP PRINCIPAL -->
+    <div id="main-app" class="hide-app">
+        <nav class="fixed top-0 w-full z-50 p-4">
+            <div class="max-w-[1400px] mx-auto glass rounded-3xl p-4 px-8 flex items-center justify-between shadow-2xl border border-white/5">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center">
+                         <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                    <span class="text-2xl font-black tracking-tighter">mini<span class="text-purple-500">Tube</span></span>
+                </div>
                 <div class="flex items-center gap-4">
-                    <span id="user-display" class="hidden sm:block text-xs font-bold text-purple-400 uppercase tracking-widest bg-purple-500/10 px-3 py-1 rounded-full">User</span>
-                    <button onclick="location.reload()" class="text-xs text-gray-500 hover:text-white underline">Salir</button>
+                    <span id="user-display" class="text-[10px] font-black text-purple-400 uppercase tracking-[0.2em] bg-purple-500/10 px-4 py-1.5 rounded-full border border-purple-500/20">User</span>
+                    <button onclick="location.reload()" class="text-xs text-gray-500 hover:text-white">Salir</button>
                 </div>
             </div>
         </nav>
 
-        <main class="pt-32 px-6 max-w-[1600px] mx-auto">
-            <!-- Grid de Videos -->
-            <div id="video-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                <!-- Se llena dinámicamente -->
+        <main class="pt-28 pb-20 px-6 max-w-[1400px] mx-auto">
+            <div id="video-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Dinámico -->
             </div>
         </main>
     </div>
 
-    <!-- MODAL REPRODUCTOR -->
-    <div id="player-modal" class="fixed inset-0 z-[2000] hidden items-center justify-center p-4 sm:p-8">
+    <!-- REPRODUCTOR -->
+    <div id="player-modal" class="fixed inset-0 z-[3000] hidden items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/95 backdrop-blur-2xl" onclick="closePlayer()"></div>
-        <div class="relative w-full max-w-5xl glass rounded-[2.5rem] overflow-hidden shadow-2xl transition-all duration-500" id="modal-box">
+        <div class="relative w-full max-w-5xl glass rounded-[2.5rem] overflow-hidden">
             <div class="aspect-video bg-black relative">
                 <video id="video-player" class="w-full h-full" controls playsinline></video>
-                <button onclick="closePlayer()" class="absolute top-4 right-4 bg-white/10 hover:bg-white/20 p-2 rounded-full backdrop-blur-md">
+                <button onclick="closePlayer()" class="absolute top-4 right-4 bg-black/40 hover:bg-white/20 p-2 rounded-full text-white">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
-            <div class="p-8">
-                <h2 id="modal-title" class="text-2xl font-bold glow-text">Título</h2>
-                <div class="flex items-center gap-4 mt-4">
-                    <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-purple-600 to-pink-500 p-[2px]">
-                        <div class="w-full h-full rounded-full bg-tube-surface flex items-center justify-center font-bold">MT</div>
-                    </div>
-                    <div>
-                        <p class="font-bold">miniTube Official</p>
-                        <p class="text-xs text-gray-500">Suscrito • 2026</p>
-                    </div>
+            <div class="p-6 md:p-8 flex items-center justify-between">
+                <div>
+                    <h2 id="modal-title" class="text-xl md:text-2xl font-bold">Título</h2>
+                    <p id="modal-user-label" class="text-sm text-purple-500 font-bold mt-1">@User</p>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- BASE DE DATOS DE USUARIOS PERMITIDOS ---
-        const USERS = {
+        const USERS_AUTH = {
             "Jonathan7612": "JONATHAN56138",
             "Kathya2095": "gataxdgata",
             "Andersxn": "ANDERSXN9182",
-            "Papitaconpapa_xd": "Amo las papas fritas :3",
-            "User176278123": "81673913",
-            "User81279910": "9167397",
-            "User91838812": "8139913333",
-            "Userkwi18382": "1822818211",
-            "UNKNAME812671": "PKAL17723",
-            "XTX7138": "HP50691"
+            "Papitaconpapa_xd": "Amo las papas fritas :3"
         };
 
-        // --- PAQUETES DE VIDEOS (40 ESPACIOS) ---
-        // Deja el url vacío "" si no quieres que el recuadro aparezca.
+        // --- LISTA DE 40 VIDEOS ---
+        // Si la URL está vacía, el sistema NO mostrará el cuadro.
         const VIDEOS = [
-            { id: 1, title: "Video de Prueba 01", url: "https://www.w3schools.com/html/mov_bbb.mp4", thumb: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800" },
-            { id: 2, title: "Naturaleza Zen", url: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4", thumb: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800" },
-            { id: 3, title: "", url: "", thumb: "" }, // No aparecerá
-            { id: 4, title: "", url: "", thumb: "" },
-            { id: 5, title: "", url: "", thumb: "" },
-            { id: 6, title: RAPTURE"", url:"https://github.com/New-Brothers-Studios-LLC/Setup-MiniTube.com/raw/refs/heads/main/lv_0_20260216215137.mp4", thumb: "" },
-            { id: 7, title:"", url:"", thumb: "" },
-            { id: 8, title: "", url: "", thumb: "" },
-            { id: 9, title: "", url: "", thumb: "" },
-            { id: 10, title: "", url: "", thumb: "" },
-            { id: 11, title: "", url: "", thumb: "" },
-            { id: 12, title: "", url: "", thumb: "" },
-            { id: 13, title: "", url: "", thumb: "" },
-            { id: 14, title: "", url: "", thumb: "" },
-            { id: 15, title: "", url: "", thumb: "" },
-            { id: 16, title: "", url: "", thumb: "" },
-            { id: 17, title: "", url: "", thumb: "" },
-            { id: 18, title: "", url: "", thumb: "" },
-            { id: 19, title: "", url: "", thumb: "" },
-            { id: 20, title: "", url: "", thumb: "" },
-            { id: 21, title: "", url: "", thumb: "" },
-            { id: 22, title: "", url: "", thumb: "" },
-            { id: 23, title: "", url: "", thumb: "" },
-            { id: 24, title: "", url: "", thumb: "" },
-            { id: 25, title: "", url: "", thumb: "" },
-            { id: 26, title: "", url: "", thumb: "" },
-            { id: 27, title: "", url: "", thumb: "" },
-            { id: 28, title: "", url: "", thumb: "" },
-            { id: 29, title: "", url: "", thumb: "" },
-            { id: 30, title: "", url: "", thumb: "" },
-            { id: 31, title: "", url: "", thumb: "" },
-            { id: 32, title: "", url: "", thumb: "" },
-            { id: 33, title: "", url: "", thumb: "" },
-            { id: 34, title: "", url: "", thumb: "" },
-            { id: 35, title: "", url: "", thumb: "" },
-            { id: 36, title: "", url: "", thumb: "" },
-            { id: 37, title: "", url: "", thumb: "" },
-            { id: 38, title: "", url: "", thumb: "" },
-            { id: 39, title: "", url: "", thumb: "" },
-            { id: 40, title: "", url: "", thumb: "" },
+            { id: 1, title:"", url: "", user: "Jonathan7612" },
+            { id: 2, title: "", url: "", user: "Kathya2095" },
+            { id: 3, title: "RAPTURE", url: "https://github.com/New-Brothers-Studios-LLC/Setup-MiniTube.com/raw/refs/heads/main/lv_0_20260216215137.mp4", user: "Andersxn" },
+            { id: 4, title: "", url: "", user: "" }, // No aparecerá
+            { id: 5, title: "", url: "", user: "" },
+            { id: 6, title: "", url: "", user: "" },
+            { id: 7, title: "", url: "", user: "" },
+            { id: 8, title: "", url: "", user: "" },
+            { id: 9, title: "", url: "", user: "" },
+            { id: 10, title: "", url: "", user: "" },
+            { id: 11, title: "", url: "", user: "" },
+            { id: 12, title: "", url: "", user: "" },
+            { id: 13, title: "", url: "", user: "" },
+            { id: 14, title: "", url: "", user: "" },
+            { id: 15, title: "", url: "", user: "" },
+            { id: 16, title: "", url: "", user: "" },
+            { id: 17, title: "", url: "", user: "" },
+            { id: 18, title: "", url: "", user: "" },
+            { id: 19, title: "", url: "", user: "" },
+            { id: 20, title: "", url: "", user: "" },
+            { id: 21, title: "", url: "", user: "" },
+            { id: 22, title: "", url: "", user: "" },
+            { id: 23, title: "", url: "", user: "" },
+            { id: 24, title: "", url: "", user: "" },
+            { id: 25, title: "", url: "", user: "" },
+            { id: 26, title: "", url: "", user: "" },
+            { id: 27, title: "", url: "", user: "" },
+            { id: 28, title: "", url: "", user: "" },
+            { id: 29, title: "", url: "", user: "" },
+            { id: 30, title: "", url: "", user: "" },
+            { id: 31, title: "", url: "", user: "" },
+            { id: 32, title: "", url: "", user: "" },
+            { id: 33, title: "", url: "", user: "" },
+            { id: 34, title: "", url: "", user: "" },
+            { id: 35, title: "", url: "", user: "" },
+            { id: 36, title: "", url: "", user: "" },
+            { id: 37, title: "", url: "", user: "" },
+            { id: 38, title: "", url: "", user: "" },
+            { id: 39, title: "", url: "", user: "" },
+            { id: 40, title: "", url: "", user: "" }
         ];
 
-        // --- LÓGICA DE LOGIN ---
-        function handleLogin() {
-            const u = document.getElementById('username').value;
-            const p = document.getElementById('password').value;
-            const err = document.getElementById('error-msg');
+        async function generateThumb(url) {
+            return new Promise((resolve) => {
+                const video = document.createElement('video');
+                video.src = url;
+                video.crossOrigin = "anonymous";
+                video.currentTime = 1;
+                video.onloadeddata = () => {
+                    const canvas = document.getElementById('thumb-generator');
+                    canvas.width = 480;
+                    canvas.height = 270;
+                    canvas.getContext('2d').drawImage(video, 0, 0, 480, 270);
+                    resolve(canvas.toDataURL('image/jpeg'));
+                };
+                video.onerror = () => resolve('https://images.unsplash.com/photo-1614850523296-e8c0a003932f?w=600');
+            });
+        }
 
-            if (USERS[u] && USERS[u] === p) {
+        function handleLogin() {
+            const u = document.getElementById('username').value.trim();
+            const p = document.getElementById('password').value;
+            if (USERS_AUTH[u] && USERS_AUTH[u] === p) {
                 document.getElementById('login-screen').classList.add('hide-app');
-                document.getElementById('main-app').classList.remove('hide-app');
+                document.getElementById('premium-ad-modal').classList.remove('hidden');
+                document.getElementById('premium-ad-modal').classList.add('flex');
                 document.getElementById('user-display').innerText = u;
-                renderVideos();
             } else {
+                const err = document.getElementById('error-msg');
                 err.style.opacity = '1';
-                setTimeout(() => err.style.opacity = '0', 3000);
+                setTimeout(() => err.style.opacity = '0', 2000);
             }
         }
 
-        // --- RENDERIZADO DE VIDEOS ---
-        function renderVideos() {
+        function closePremiumAd() {
+            document.getElementById('premium-ad-modal').classList.add('hidden');
+            document.getElementById('premium-ad-modal').classList.remove('flex');
+            document.getElementById('main-app').classList.remove('hide-app');
+            renderVideos();
+        }
+
+        async function renderVideos() {
             const grid = document.getElementById('video-grid');
             grid.innerHTML = '';
+            
+            // Solo procesar videos que tengan URL
+            const validVideos = VIDEOS.filter(v => v.url !== "");
 
-            // Solo filtramos los que tengan URL
-            const validVideos = VIDEOS.filter(v => v.url && v.url.trim() !== "");
-
-            validVideos.forEach((v, i) => {
+            for (const v of validVideos) {
+                const thumb = await generateThumb(v.url);
                 const card = document.createElement('div');
-                card.className = `video-card glass rounded-[2rem] overflow-hidden cursor-pointer opacity-0`;
-                card.style.animation = `fadeInUp 0.6s ease forwards ${i * 0.1}s`;
-                
+                card.className = "video-card glass rounded-[2rem] overflow-hidden cursor-pointer";
                 card.innerHTML = `
                     <div class="relative aspect-video">
-                        <img src="${v.thumb || 'https://images.unsplash.com/photo-1614850523296-e8c0a003932f?w=800'}" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                            <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center text-black">
-                                <svg class="w-6 h-6 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                            </div>
+                        <img src="${thumb}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-all flex items-center justify-center opacity-0 hover:opacity-100">
+                             <div class="w-12 h-12 bg-white text-black rounded-full flex items-center justify-center"><svg class="w-6 h-6 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
                         </div>
                     </div>
-                    <div class="p-6">
-                        <h3 class="font-bold text-lg leading-tight line-clamp-2">${v.title || "Video sin título"}</h3>
-                        <p class="text-xs text-gray-500 mt-2 uppercase tracking-tighter">Premium Content • 4K</p>
+                    <div class="p-5">
+                        <h3 class="font-bold text-sm line-clamp-1">${v.title || 'Video sin título'}</h3>
+                        <p class="text-[10px] text-purple-400 font-black mt-2 uppercase tracking-widest">Publicado por @${v.user}</p>
                     </div>
                 `;
                 card.onclick = () => openPlayer(v);
                 grid.appendChild(card);
-            });
+            }
         }
 
-        // --- REPRODUCTOR ---
-        const modal = document.getElementById('player-modal');
-        const player = document.getElementById('video-player');
-
         function openPlayer(v) {
+            const modal = document.getElementById('player-modal');
+            const player = document.getElementById('video-player');
             document.getElementById('modal-title').innerText = v.title;
+            document.getElementById('modal-user-label').innerText = `@${v.user}`;
             player.src = v.url;
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -288,21 +288,12 @@
         }
 
         function closePlayer() {
+            const modal = document.getElementById('player-modal');
+            const player = document.getElementById('video-player');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
             player.pause();
-            player.src = "";
         }
-
-        // Animación CSS extra inyectada
-        const style = document.createElement('style');
-        style.innerHTML = `
-            @keyframes fadeInUp {
-                from { opacity: 0; transform: translateY(30px); }
-                to { opacity: 1; transform: translateY(0); }
-            }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
 </html>
